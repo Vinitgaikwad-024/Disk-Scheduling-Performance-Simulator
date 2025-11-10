@@ -94,12 +94,34 @@ for (int i = 0; i < n-1; i++)
 }
 
 
-int workload();
+int workload(int pattern, int req[], int *n, int *disk_size, int *head)
+{
+    printf("\nGenerating realistic I/O workload pattern...\n");
+    if (pattern == 1) { // Sequential (like video playback)
+        *n = 8;
+        int temp[] = {10, 20, 30, 40, 50, 60, 70, 80};
+        memcpy(req, temp, sizeof(temp));
+        *head = 35;
+        *disk_size = 200;
+    } else if (pattern == 2) { // Random (like web requests)
+        *n = 10;
+        int temp[] = {176, 79, 34, 60, 92, 11, 41, 114, 7, 124};
+        memcpy(req, temp, sizeof(temp));
+        *head = 50;
+        *disk_size = 200;
+    } else { // Mixed workload
+        *n = 12;
+        int temp[] = {23, 89, 132, 42, 187, 16, 190, 11, 43, 140, 24, 82};
+        memcpy(req, temp, sizeof(temp));
+        *head = 50;
+        *disk_size = 200;
+    }
+}
 
 
 int main(){
 
-    int n, ch,req[MAX],dsize,head;
+    int n, ch,req[MAX],dsize,head,pattern;
     printf("-----Enter Choice----\n");
 
     printf("1 :\t Custom Request Sequence\n");
@@ -126,15 +148,16 @@ int main(){
         {
             printf("GOODBYE!!");
         }
+        else if (ch==2)
+        {
+             printf("Select Workload Pattern:\n1. Sequential (e.g., video streaming)\n2. Random (e.g., web access)\n3. Mixed (e.g., database system)\nChoice: ");
+            scanf("%d", &pattern);
+            simulate_workload(pattern, req, &n, &dsize, &head);
+        }
         
-        
-    }
-    
+        int t_fcfs,t_sstf,t_scan,t_cscan,t_look,t_clook;
 
-    int t_fcfs,t_sstf,t_scan,t_cscan,t_look,t_clook;
-
-
-    printf("\nRunning algorithms.......\n");
+        printf("\nRunning algorithms.......\n");
 
     printf("\n\n====================== DISK SCHEDULING PERFORMANCE SUMMARY ======================\n");
 printf("*------------*------------------------*------------------*\n");
@@ -148,9 +171,25 @@ printf("| %-10s | %-22d | %-16.2f |\n", "LOOK",  t_look,  (float)t_look / n);
 printf("| %-10s | %-22d | %-16.2f |\n", "C-LOOK", t_clook, (float)t_clook / n);
 printf("*------------*------------------------*------------------*\n");
 
+      int min = t_fcfs;
+        char best[20] = "FCFS";
+        if (t_sstf < min) { min = t_sstf; strcpy(best, "SSTF"); }
+        if (t_scan < min) { min = t_scan; strcpy(best, "SCAN"); }
+        if (t_cscan < min) { min = t_cscan; strcpy(best, "C-SCAN"); }
+        if (t_look < min) { min = t_look; strcpy(best, "LOOK"); }
+        if (t_clook < min) { min = t_clook; strcpy(best, "C-LOOK"); }
+
+        printf("\n🏆 Best Performing Algorithm: %s (Minimum Total Head Movement = %d)\n", best, min);
+ 
+
+
+        
+    }
     
 
 
+
+    
 
 return 0;
 }
