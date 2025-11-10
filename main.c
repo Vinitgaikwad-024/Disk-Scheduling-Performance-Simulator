@@ -1,126 +1,98 @@
 #include<stdio.h>
-#include<stdlib.h>
 #define MAX 100
 
-int fcfs(){
-    int n, i, head, total_seek = 0;
-
-    printf("Enter number of disk requests: ");
-    scanf("%d", &n);
-
-    int request[n];
-    printf("Enter the disk request sequence:\n");
-    for (i = 0; i < n; i++) {
-        scanf("%d", &request[i]);
-    }
-
-    printf("Enter initial head position: ");
-    scanf("%d", &head);
-
-    printf("\nFCFS Disk Scheduling:\n");
-    printf("Sequence of movement: %d", head);
-
-    for (i = 0; i < n; i++) {
-        printf(" -> %d", request[i]);
-        total_seek += abs(request[i] - head);
-        head = request[i];
-    }
-
-    printf("\nTotal Seek Time = %d", total_seek);
-    printf("\nAverage Seek Time = %.2f\n", (float)total_seek / n);
-
-    return 0;
+void display(char *x,int total, int n){
+    printf("\n[%s] Total Head Movement: %d | Average Seek Time: %.2f\n",
+           x, total, (float)total / n);
 }
-void scan(int arr[], int n, int head, int disk_size, int direction) {
-    int seek_count = 0, distance, cur_track;
-    int temp[n + 1], i, j;
+int fcfs(); // VINIT
+int scan();//vinit
+int clook(int req[],int n,int head){
 
-    for (i = 0; i < n; i++) temp[i] = arr[i];
-    temp[n] = head;
-    n++;
-
-    // Sort the requests
-    for (i = 0; i < n - 1; i++)
-        for (j = i + 1; j < n; j++)
-            if (temp[i] > temp[j]) {
-                int t = temp[i];
-                temp[i] = temp[j];
-                temp[j] = t;
-            }
+     int total = 0, arr[MAX + 1];
+    for (int i = 0; i < n; i++) arr[i] = req[i];
+    arr[n++] = head;
+    sort(arr, n);
 
     int pos;
-    for (i = 0; i < n; i++)
-        if (temp[i] == head) { pos = i; break; }
+    for (int i = 0; i < n; i++) if (arr[i] == head) { pos = i; break; }
 
-    printf("Seek sequence: ");
-    if (direction == 1) { // Right
-        for (i = pos; i < n; i++) printf("%d ", temp[i]);
-        printf("%d ", disk_size - 1);
-        for (i = pos - 1; i >= 0; i--) printf("%d ", temp[i]);
-    } else { // Left
-        for (i = pos; i >= 0; i--) printf("%d ", temp[i]);
-        printf("0 ");
-        for (i = pos + 1; i < n; i++) printf("%d ", temp[i]);
-    }
-    printf("\n");
+    total = (arr[n - 1] - head) + (arr[n - 1] - arr[0]) + (arr[pos - 1] - arr[0]);
+    display("C-LOOK", total, n - 1);
+    return total;
+
 }
+int look(int req[],int n,int head){
 
-int main() {
-    int arr[] = {82, 170, 43, 140, 24, 16, 190};
-    int size = sizeof(arr)/sizeof(arr[0]);
-    int head = 50;
-    int disk_size = 200;
-    int direction = 1; // 1 = Right, 0 = Left
+    int dir;        
+    printf("enter Direction \n1 : UP\n2 : DOWN\n ");
 
-    scan(arr, size, head, disk_size, direction);
-    return 0;
-}
-
-int clook();
-int look();
-void cscan(int arr[], int n, int head, int disk_size) {
-    int seek_count = 0, i, j;
-    int temp[n + 2];
-
-    for (i = 0; i < n; i++) temp[i] = arr[i];
-    temp[n] = head;
-    temp[n + 1] = disk_size - 1; // end point
-    n += 2;
-
-    // Sort
-    for (i = 0; i < n - 1; i++)
-        for (j = i + 1; j < n; j++)
-            if (temp[i] > temp[j]) {
-                int t = temp[i];
-                temp[i] = temp[j];
-                temp[j] = t;
-            }
+    scanf("%d",&dir);
+    int total = 0, arr[MAX + 1];
+    for (int i = 0; i < n; i++) arr[i] = req[i];
+    arr[n++] = head;
+    sort(arr, n);
 
     int pos;
-    for (i = 0; i < n; i++)
-        if (temp[i] == head) { pos = i; break; }
+    for (int i = 0; i < n; i++) if (arr[i] == head) { pos = i; break; }
 
-    printf("Seek sequence: ");
-    for (i = pos; i < n; i++) printf("%d ", temp[i]);
-    printf("0 ");
-    for (i = 0; i < pos; i++) printf("%d ", temp[i]);
-    printf("\n");
+    if (dir == 1)
+        total += (arr[n - 1] - head) + (arr[n - 1] - arr[0]);
+    else
+        total += (head - arr[0]) + (arr[n - 1] - arr[0]);
+
+    display("LOOK", total, n - 1);
+    return total;
+
+
+}
+int cscan();//
+int sstf(int req[], int n, int head) {
+    int done[MAX] = {0}, total = 0;
+    for (int count = 0; count < n; count++) {
+        int min = 1e9, index = -1;
+        for (int i = 0; i < n; i++)
+            if (!done[i] && absolute(req[i] - head) < min) {
+                min = absolute(req[i] - head);
+                index = i;
+            }
+        total += absolute(req[index] - head);
+        head = req[index];
+        done[index] = 1;
+    }
+    display("SSTF", total, n);
+    return total;
 }
 
-int main() {
-    int arr[] = {82, 170, 43, 140, 24, 16, 190};
-    int size = sizeof(arr)/sizeof(arr[0]);
-    int head = 50;
-    int disk_size = 200;
+int abs(int a){
+    if(a<0){
+        return -a;
+    }
+    else{
+        return a;
+    }
 
-    cscan(arr, size, head, disk_size);
-    return 0;
+}
+int Sort(int a[],int n){
+
+for (int i = 0; i < n-1; i++)
+{
+    for (int j = 0; j < n-i-1; j++)
+    {
+        if (a[j]>a[j+1])
+        {
+            int t=a[j];
+            a[j]=a[j+1];
+            a[j+1]=t;
+        }
+        
+    }
+    
 }
 
-int sstf();
-int abs();//
-int Sort();//
-int Summary();//
+
+}
+
 
 int workload(int pattern, int req[], int *n, int *disk_size, int *head)
 {
@@ -183,14 +155,7 @@ int main(){
             simulate_workload(pattern, req, &n, &dsize, &head);
         }
         
-
-        
-    }
-    
-    int t_fcfs,t_sstf,t_scan,t_cscan,t_look,t_clook;
-
         int t_fcfs,t_sstf,t_scan,t_cscan,t_look,t_clook;
-
 
         printf("\nRunning algorithms.......\n");
 
@@ -205,5 +170,26 @@ printf("| %-10s | %-22d | %-16.2f |\n", "C-SCAN", t_cscan, (float)t_cscan / n);
 printf("| %-10s | %-22d | %-16.2f |\n", "LOOK",  t_look,  (float)t_look / n);
 printf("| %-10s | %-22d | %-16.2f |\n", "C-LOOK", t_clook, (float)t_clook / n);
 printf("*------------*------------------------*------------------*\n");
+
+      int min = t_fcfs;
+        char best[20] = "FCFS";
+        if (t_sstf < min) { min = t_sstf; strcpy(best, "SSTF"); }
+        if (t_scan < min) { min = t_scan; strcpy(best, "SCAN"); }
+        if (t_cscan < min) { min = t_cscan; strcpy(best, "C-SCAN"); }
+        if (t_look < min) { min = t_look; strcpy(best, "LOOK"); }
+        if (t_clook < min) { min = t_clook; strcpy(best, "C-LOOK"); }
+
+        printf("\n🏆 Best Performing Algorithm: %s (Minimum Total Head Movement = %d)\n", best, min);
+ 
+
+
+        
+    }
+    
+
+
+
+    
+
 return 0;
 }
