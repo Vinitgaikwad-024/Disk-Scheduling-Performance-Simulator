@@ -1,14 +1,42 @@
 #include<stdio.h>
 #define MAX 100
 
+int display(char *x);
+
 int fcfs(); // VINIT
 int scan();
 int clook();
 int look();
 int cscan();
 int sstf();
-int abs();
-int Sort();
+int abs(int a){
+    if(a<0){
+        return -a;
+    }
+    else{
+        return a;
+    }
+
+}
+int Sort(int a[],int n){
+
+for (int i = 0; i < n-1; i++)
+{
+    for (int j = 0; j < n-i-1; j++)
+    {
+        if (a[j]>a[j+1])
+        {
+            int t=a[j];
+            a[j]=a[j+1];
+            a[j+1]=t;
+        }
+        
+    }
+    
+}
+
+
+}
 int Summary();
 
 int workload();
