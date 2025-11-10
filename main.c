@@ -183,14 +183,14 @@ int main(){
             simulate_workload(pattern, req, &n, &dsize, &head);
         }
         
-main
+
         
     }
     
     int t_fcfs,t_sstf,t_scan,t_cscan,t_look,t_clook;
 
         int t_fcfs,t_sstf,t_scan,t_cscan,t_look,t_clook;
-main
+
 
         printf("\nRunning algorithms.......\n");
 
